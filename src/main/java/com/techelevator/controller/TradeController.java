@@ -22,9 +22,9 @@ public class TradeController {
     public Trade buyStock(Principal principal, @PathVariable int id, @RequestBody Trade trade) {
         return tradeDao.buyStock(principal.getName(), id, trade);
     }
-    @RequestMapping(value = "/games/{id}/sell", method = RequestMethod.POST)
-    public Trade sellStock(Principal principal, @PathVariable int id, @RequestBody Trade trade) {
-        return tradeDao.sellStock(principal.getName(), id, trade);
+    @RequestMapping(value = "/games/{id}/sell/{all}", method = RequestMethod.POST)
+    public Trade sellStock(Principal principal, @PathVariable int id, @RequestBody Trade trade, @PathVariable boolean all) {
+        return tradeDao.sellStock(principal.getName(), id, trade, all);
     }
 
 }

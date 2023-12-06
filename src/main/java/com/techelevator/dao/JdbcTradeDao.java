@@ -54,15 +54,20 @@ public class JdbcTradeDao implements TradeDao {
     }
 
     @Override
-    public Trade sellStock(String username, int gameId, Trade trade) {
+    public Trade sellStock(String username, int gameId, Trade trade, boolean all) {
         String idSql = "SELECT user_id FROM users WHERE username = ?";
         int userId = jdbcTemplate.queryForObject(idSql, int.class, username);
         String tradeSql = "INSERT INTO stock_trade (user_id, game_id, trade_date, stock_ticker, trade_quantity, stock_trade_price, trade_type) VALUES (?, ?, ?, ?, ?, ?, 'Sell') RETURNING trade_id";
         int id = jdbcTemplate.queryForObject(tradeSql, int.class, userId, gameId, trade.getDate(), trade.getTicker(), trade.getQuantity(), trade.getPrice());
         String balanceSql = "UPDATE user_game SET game_balance = game_balance + ? WHERE user_id = ? AND game_id = ?";
         jdbcTemplate.update(balanceSql, trade.getPrice().multiply(trade.getQuantity()), userId, gameId);
-        String portfolioSql = "UPDATE portfolio SET stock_quantity = stock_quantity - ? WHERE user_id = ? AND game_id = ? AND stock_ticker = ?";
-        jdbcTemplate.update(portfolioSql, trade.getQuantity(), userId, gameId, trade.getTicker());
+        if (all) {
+            String portfolioSql = "UPDATE portfolio SET stock_quantity = 0 WHERE user_id = ? AND game_id = ? AND stock_ticker = ?";
+            jdbcTemplate.update(portfolioSql, userId, gameId, trade.getTicker());
+        } else {
+            String portfolioSql = "UPDATE portfolio SET stock_quantity = stock_quantity - ? WHERE user_id = ? AND game_id = ? AND stock_ticker = ?";
+            jdbcTemplate.update(portfolioSql, trade.getQuantity(), userId, gameId, trade.getTicker());
+        }
         return getTradeById(id);
     }
     private Trade mapRowToTrade(SqlRowSet rs) {
