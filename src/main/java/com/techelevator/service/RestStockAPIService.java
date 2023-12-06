@@ -61,12 +61,12 @@ public class RestStockAPIService implements StockAPIService {
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
         ObjectMapper objectMapper = new ObjectMapper();
-
+        System.out.println(date);
+        System.out.println(response.toString());
         List<Stock> listOfStocks = new ArrayList<>();
         try {
             JsonNode jsonNode = objectMapper.readTree(response.getBody());
             for(JsonNode element : jsonNode.path("results")) {
-
                 String ticker = element.path("T").asText();
                 String close = element.path("c").asText();
                 String open = element.path("o").asText();

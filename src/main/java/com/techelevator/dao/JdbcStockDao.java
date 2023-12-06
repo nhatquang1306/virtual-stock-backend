@@ -25,7 +25,6 @@ public class JdbcStockDao implements StockDao {
 
     @Override
     public void updateStockInfo(List<Stock> stocks) {
-        System.out.println(stocks.size());
         LocalDate date = LocalDate.now();
         if (date.getDayOfWeek().getValue() == 1) {
             date = date.minusDays(3);
