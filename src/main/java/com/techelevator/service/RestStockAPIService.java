@@ -98,6 +98,7 @@ public class RestStockAPIService implements StockAPIService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+        System.out.println(listOfStocks.size());
         return listOfStocks;
     }
 
