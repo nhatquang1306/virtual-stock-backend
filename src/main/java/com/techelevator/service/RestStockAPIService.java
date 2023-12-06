@@ -53,6 +53,7 @@ public class RestStockAPIService implements StockAPIService {
         } else {
             date = date.minusDays(1);
         }
+        date = date.minusDays(3);
 
         String url = "https://api.polygon.io/v2/aggs/grouped/locale/us/market/stocks/" + date + "?adjusted=true";
         HttpHeaders headers = new HttpHeaders();
