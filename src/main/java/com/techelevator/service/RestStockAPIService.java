@@ -43,7 +43,6 @@ public class RestStockAPIService implements StockAPIService {
 
     @Override
     public List<Stock> getStocks(LocalDate date) {
-
         // Monday dayOfWeek value is 1
         if (date.getDayOfWeek().getValue() == 1) {
             date = date.minusDays(3);
@@ -53,16 +52,12 @@ public class RestStockAPIService implements StockAPIService {
         } else {
             date = date.minusDays(1);
         }
-        date = date.minusDays(27);
-
         String url = "https://api.polygon.io/v2/aggs/grouped/locale/us/market/stocks/" + date + "?adjusted=true";
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", token);
         HttpEntity<String> httpEntity = new HttpEntity<>(headers);
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, httpEntity, String.class);
         ObjectMapper objectMapper = new ObjectMapper();
-        System.out.println(date);
-        System.out.println(response.toString());
         List<Stock> listOfStocks = new ArrayList<>();
         try {
             JsonNode jsonNode = objectMapper.readTree(response.getBody());
@@ -98,7 +93,6 @@ public class RestStockAPIService implements StockAPIService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        System.out.println(listOfStocks.size());
         return listOfStocks;
     }
 
