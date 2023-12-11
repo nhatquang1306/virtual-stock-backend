@@ -18,7 +18,17 @@ import java.util.ResourceBundle;
 
 @SpringBootApplication
 public class Application {
+
     public static int randomSeed;
+    public static long generateSeed(String ticker, int time) {
+        int seed = randomSeed;
+        int count = 1;
+        for (char c : ticker.toCharArray()) {
+            seed ^= (c << count);
+            count += 3;
+        }
+        return ((long)time << 32) | seed;
+    }
 
 
 

@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static com.techelevator.Application.generateSeed;
+
 @Component
 public class JdbcStockDao implements StockDao {
 
@@ -103,15 +105,6 @@ public class JdbcStockDao implements StockDao {
         }
         return stock;
     }
-    private int generateSeed(String ticker, int time) {
-        int seed = Application.randomSeed + time;
-        for (char c : ticker.toCharArray()) {
-            seed += c;
-        }
-        return seed;
-    }
-
-
     private Stock mapRowsToStock(SqlRowSet rs) {
         Stock stock = new Stock();
         stock.setTicker(rs.getString("ticker"));

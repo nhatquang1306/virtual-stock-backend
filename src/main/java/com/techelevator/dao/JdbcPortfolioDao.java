@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static com.techelevator.Application.generateSeed;
+
 @Component
 
 public class JdbcPortfolioDao implements PortfolioDao {
@@ -51,13 +53,6 @@ public class JdbcPortfolioDao implements PortfolioDao {
         } catch (EmptyResultDataAccessException e) {
             throw new RuntimeException("Stock not currently owned", e);
         }
-    }
-    private int generateSeed(String ticker, int time) {
-        int seed = Application.randomSeed + time;
-        for (char c : ticker.toCharArray()) {
-            seed += c;
-        }
-        return seed;
     }
     private Portfolio mapRowsToPortfolio (SqlRowSet rs) {
         Portfolio portfolio = new Portfolio();
