@@ -22,7 +22,7 @@ public class Application {
     public static int randomSeed;
     public static long generateSeed(String ticker, int time) {
         int seed = randomSeed;
-        int count = 1;
+        int count = 0;
         for (char c : ticker.toCharArray()) {
             seed ^= (c << count);
             count += 3;
