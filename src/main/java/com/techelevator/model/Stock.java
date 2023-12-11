@@ -24,8 +24,6 @@ public class Stock {
     private double dayTradingVolume;
     @JsonProperty("vw")
     private BigDecimal weightedAverage;
-    @JsonProperty("prices")
-    private BigDecimal[] prices;
     @JsonProperty("current_price")
     private BigDecimal currentPrice;
     private String name;
@@ -33,7 +31,7 @@ public class Stock {
     public Stock() {
     }
 
-    public Stock(String ticker, BigDecimal closePrice, BigDecimal openPrice, BigDecimal highestPrice, BigDecimal lowestPrice, LocalDate viewDate, double dayTradingVolume, BigDecimal weightedAverage, BigDecimal[] prices) {
+    public Stock(String ticker, BigDecimal closePrice, BigDecimal openPrice, BigDecimal highestPrice, BigDecimal lowestPrice, LocalDate viewDate, double dayTradingVolume, BigDecimal weightedAverage) {
         this.ticker = ticker;
         this.closePrice = closePrice;
         this.openPrice = openPrice;
@@ -42,7 +40,6 @@ public class Stock {
         this.viewDate = viewDate;
         this.dayTradingVolume = dayTradingVolume;
         this.weightedAverage = weightedAverage;
-        this.prices = prices;
     }
 
     public String getTicker() {
@@ -115,14 +112,6 @@ public class Stock {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public BigDecimal[] getPrices() {
-        return prices;
-    }
-
-    public void setPrices(BigDecimal[] prices) {
-        this.prices = prices;
     }
 
     public BigDecimal getCurrentPrice() {

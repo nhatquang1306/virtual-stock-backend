@@ -77,7 +77,6 @@ CREATE TABLE stock (
     view_date timestamp NOT NULL,
     day_trading_volume NUMERIC NOT NULL,
     weighted_average_price NUMERIC NOT NULL,
-    prices NUMERIC[] NOT NULL,
     CONSTRAINT PK_stock PRIMARY KEY (ticker)
 );
 

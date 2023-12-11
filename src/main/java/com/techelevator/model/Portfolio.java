@@ -86,4 +86,5 @@ public class Portfolio {
     public void setCurrentPrice(BigDecimal currentPrice) {
         this.currentPrice = currentPrice;
     }
+
 }

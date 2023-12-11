@@ -80,14 +80,7 @@ public class RestStockAPIService implements StockAPIService {
                 BigDecimal highestPrice = new BigDecimal(highest);
                 BigDecimal lowestPrice = new BigDecimal(lowest);
                 BigDecimal weightedAveragePrice = new BigDecimal(weightedAverage);
-                BigDecimal[] prices = new BigDecimal[48];
-                prices[0] = openPrice;
-                prices[47] = closePrice;
-                BigDecimal diff = highestPrice.subtract(lowestPrice);
-                for (int i = 1; i < 47; i++) {
-                    prices[i] = lowestPrice.add(diff.multiply(BigDecimal.valueOf(Math.random())));
-                }
-                Stock stock = new Stock(ticker, closePrice, openPrice, highestPrice, lowestPrice, date, Double.parseDouble(dayTradingVolume), weightedAveragePrice, prices);
+                Stock stock = new Stock(ticker, closePrice, openPrice, highestPrice, lowestPrice, date, Double.parseDouble(dayTradingVolume), weightedAveragePrice);
                 listOfStocks.add(stock);
             }
         } catch (JsonProcessingException e) {

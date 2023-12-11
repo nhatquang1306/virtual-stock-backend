@@ -18,11 +18,12 @@ import java.util.ResourceBundle;
 
 @SpringBootApplication
 public class Application {
+    public static int randomSeed;
 
 
 
     public static void main(String[] args) {
-
+        randomSeed = (int)(Math.random() * Integer.MAX_VALUE / 2);
         SpringApplication.run(Application.class, args);
 //        ResourceBundle resourceBundle = ResourceBundle.getBundle("application");
 //        StockAPIService service = new RestStockAPIService();

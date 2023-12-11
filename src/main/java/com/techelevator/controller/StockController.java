@@ -1,5 +1,6 @@
 package com.techelevator.controller;
 
+import com.techelevator.Application;
 import com.techelevator.dao.StockDao;
 import com.techelevator.dao.TickerDao;
 import com.techelevator.model.Graph;
@@ -38,6 +39,7 @@ public class StockController {
     }
     @RequestMapping(value = "stocks/reset/", method = RequestMethod.POST)
     public void resetDatabase(Principal principal) {
+        Application.randomSeed = (int)(Math.random() * Integer.MAX_VALUE / 2);
         if (principal.getName().equals("quang") || principal.getName().equals("james") || principal.getName().equals("nick")) {
             stockDao.updateStockInfo(service.getStocks(LocalDate.now()));
         }

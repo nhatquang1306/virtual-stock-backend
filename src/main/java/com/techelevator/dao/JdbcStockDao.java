@@ -1,5 +1,6 @@
 package com.techelevator.dao;
 
+import com.techelevator.Application;
 import com.techelevator.model.Stock;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Component
 public class JdbcStockDao implements StockDao {
@@ -37,10 +39,9 @@ public class JdbcStockDao implements StockDao {
         }
         String deleteSql = "DELETE FROM stock;";
         String addSql = "INSERT INTO stock (ticker, close_price, open_price, highest_price, " +
-                "lowest_price, view_date, day_trading_volume, weighted_average_price, prices) VALUES " +
-                "(?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                "lowest_price, view_date, day_trading_volume, weighted_average_price) VALUES " +
+                "(?, ?, ?, ?, ?, ?, ?, ?);";
         try {
-            Connection connection = jdbcTemplate.getDataSource().getConnection();
             jdbcTemplate.update(deleteSql);
             List<Object[]> list = new ArrayList<>();
             for (Stock stock : stocks) {
@@ -53,7 +54,6 @@ public class JdbcStockDao implements StockDao {
                         date,
                         stock.getDayTradingVolume(),
                         stock.getWeightedAverage(),
-                        connection.createArrayOf("numeric", stock.getPrices())
                 };
                 list.add(object);
             }
@@ -62,23 +62,24 @@ public class JdbcStockDao implements StockDao {
             throw new RuntimeException("Unable to connect to server or database", e);
         } catch (BadSqlGrammarException e) {
             throw new RuntimeException("SQL syntax error", e);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
         }
     }
 
     @Override
     public List<Stock> getAllStocks() {
         int hour = LocalTime.now().getHour();
-        int minute = LocalTime.now().getMinute() >= 30 ? 1 : 0;
+        int minute = LocalTime.now().getMinute() / 5;
         List<Stock> stocks = new ArrayList<>();
-        String sql = "SELECT stock.ticker, close_price, open_price, highest_price, lowest_price, view_date, day_trading_volume, weighted_average_price, stock_company_name, prices[" + (hour * 2 + minute + 1) + "] " +
+        String sql = "SELECT stock.ticker, close_price, open_price, highest_price, lowest_price, view_date, day_trading_volume, weighted_average_price, stock_company_name " +
                 "FROM stock JOIN stock_ticker USING (ticker) ORDER BY (ticker);";
         SqlRowSet result = jdbcTemplate.queryForRowSet(sql);
+        Random rand = new Random();
         while (result.next()) {
             Stock stock = mapRowsToStock(result);
+            rand.setSeed(generateSeed(stock.getTicker(), hour * 12 + minute));
             stock.setName(result.getString("stock_company_name"));
-            stock.setCurrentPrice(result.getBigDecimal("prices"));
+            BigDecimal diff = stock.getHighestPrice().subtract(stock.getLowestPrice());
+            stock.setCurrentPrice(stock.getLowestPrice().add(diff.multiply(BigDecimal.valueOf(rand.nextDouble()))));
             stocks.add(stock);
         }
         return stocks;
@@ -87,17 +88,27 @@ public class JdbcStockDao implements StockDao {
     @Override
     public Stock getStockByTicker(String ticker) {
         int hour = LocalTime.now().getHour();
-        int minute = LocalTime.now().getMinute() >= 30 ? 1 : 0;
+        int minute = LocalTime.now().getMinute() / 5;
         Stock stock = null;
-        String sql = "SELECT stock.ticker, close_price, open_price, highest_price, lowest_price, view_date, day_trading_volume, weighted_average_price, stock_company_name, prices[" + (hour * 2 + minute + 1) + "] " +
+        String sql = "SELECT stock.ticker, close_price, open_price, highest_price, lowest_price, view_date, day_trading_volume, weighted_average_price, stock_company_name " +
                 "FROM stock JOIN stock_ticker USING (ticker) WHERE ticker = ?;";
         SqlRowSet result = jdbcTemplate.queryForRowSet(sql, ticker);
+        Random rand = new Random();
         if (result.next()) {
             stock = mapRowsToStock(result);
+            rand.setSeed(generateSeed(ticker, hour * 12 + minute));
             stock.setName(result.getString("stock_company_name"));
-            stock.setCurrentPrice(result.getBigDecimal("prices"));
+            BigDecimal diff = stock.getHighestPrice().subtract(stock.getLowestPrice());
+            stock.setCurrentPrice(stock.getLowestPrice().add(diff.multiply(BigDecimal.valueOf(rand.nextDouble()))));
         }
         return stock;
+    }
+    private int generateSeed(String ticker, int time) {
+        int seed = Application.randomSeed + time;
+        for (char c : ticker.toCharArray()) {
+            seed += c;
+        }
+        return seed;
     }
 
 
