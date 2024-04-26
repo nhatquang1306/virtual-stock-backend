@@ -17,6 +17,7 @@ public class JdbcTradeDao implements TradeDao {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    // get all trades of a user for a game
     @Override
     public List<Trade> getTradesForUser(String username, int gameId) {
         List<Trade> trades = new ArrayList<>();
@@ -28,6 +29,7 @@ public class JdbcTradeDao implements TradeDao {
         return trades;
     }
 
+    // get trade by trade id
     @Override
     public Trade getTradeById(int tradeId) {
         String sql = "SELECT * FROM stock_trade WHERE trade_id = ?";
@@ -38,6 +40,7 @@ public class JdbcTradeDao implements TradeDao {
         return null;
     }
 
+    // let a user buy stock in a game and update their balance and portfolio
     @Override
     public Trade buyStock(String username, int gameId, Trade trade) {
         String idSql = "SELECT user_id FROM users WHERE username = ?";
@@ -53,6 +56,7 @@ public class JdbcTradeDao implements TradeDao {
         return getTradeById(id);
     }
 
+    // let a user sell stock in a game and update their balance and portfolio
     @Override
     public Trade sellStock(String username, int gameId, Trade trade, boolean all) {
         String idSql = "SELECT user_id FROM users WHERE username = ?";

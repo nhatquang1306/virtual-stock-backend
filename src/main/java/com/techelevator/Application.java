@@ -20,6 +20,9 @@ import java.util.ResourceBundle;
 public class Application {
 
     public static int randomSeed;
+
+    // generate a seed based on the master seed, ticker, and current time
+    // this seed can be set on a Random variable to calculate current stock price, making it consistent across all users
     public static long generateSeed(String ticker, int time) {
         int seed = randomSeed;
         int count = 0;
@@ -33,8 +36,11 @@ public class Application {
 
 
     public static void main(String[] args) {
+        // generate a random master seed when the program boots up
         randomSeed = (int)(Math.random() * Integer.MAX_VALUE / 2);
         SpringApplication.run(Application.class, args);
+        // this part of the program calls the api to get stock and ticker information when the program boots up and populate the database
+        // this is kept as a comment because the database is already filled
 //        ResourceBundle resourceBundle = ResourceBundle.getBundle("application");
 //        StockAPIService service = new RestStockAPIService();
 //        LocalDate date = LocalDate.now();

@@ -23,6 +23,8 @@ public class JdbcPortfolioDao implements PortfolioDao {
     public JdbcPortfolioDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
+    // view the stocks a user owns for a game
     @Override
     public List<Portfolio> viewCurrentStocks(String username, int gameId) {
         int hour = LocalTime.now().getHour();
@@ -37,6 +39,7 @@ public class JdbcPortfolioDao implements PortfolioDao {
             BigDecimal highest = result.getBigDecimal("highest_price");
             BigDecimal lowest = result.getBigDecimal("lowest_price");
             Portfolio portfolio = mapRowsToPortfolio(result);
+            // calculate the stock price using seeded rng, making it consistent across all users
             rand.setSeed(generateSeed(portfolio.getTicker(), hour * 12 + minute));
             BigDecimal diff = highest.subtract(lowest);
             portfolio.setCurrentPrice(lowest.add(diff.multiply(BigDecimal.valueOf(rand.nextDouble()))));
@@ -45,6 +48,7 @@ public class JdbcPortfolioDao implements PortfolioDao {
         return portfolios;
     }
 
+    // get the quantity of a specific stock owned for a user
     @Override
     public BigDecimal getQuantityOwned(String ticker, String username, int gameId) {
         String sql = "SELECT stock_quantity FROM portfolio WHERE stock_ticker = ? AND game_id = ? AND user_id = (SELECT user_id FROM users WHERE username = ?)";

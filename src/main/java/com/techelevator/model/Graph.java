@@ -16,6 +16,7 @@ public class Graph {
     public Graph() {
     }
 
+    // function to build stock price chart
     public void buildGraph(StockGraph stockGraph) {
         graph = new ArrayList<>();
         List<StockGraph.Point> points = stockGraph.getPoints();
@@ -27,6 +28,7 @@ public class Graph {
         distance = 1 / ((double)points.size() * 2 + 1);
         int indexMax = 0;
         int indexMin = 0;
+        // get max and min stock prices
         for (int i = 1; i < points.size(); i++) {
             if (max.compareTo(points.get(i).getHigh()) < 0) {
                 max = points.get(i).getHigh();
@@ -38,11 +40,14 @@ public class Graph {
             }
             volume += points.get(i).getVolume();
         }
+        // high and low indicate the top and bottom of the chart
+        // step indicates the price increment
         double high = max.doubleValue();
         double low = min.doubleValue();
         double step = (high - low) / 6;
         high += step / 2;
         low -= step / 2;
+        // build points in the chart
         for (int i = 0; i < points.size(); i++) {
             graph.add((points.get(i).getOpen().doubleValue() - low) / (high - low));
             if (i == indexMax) {

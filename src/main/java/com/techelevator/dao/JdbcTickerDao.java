@@ -18,21 +18,13 @@ public class JdbcTickerDao implements TickerDao {
     public JdbcTickerDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
+    // delete ticker information in the database and update with new information
     @Override
     public void updateTickerInfo(List<Ticker> tickers) {
         String deleteSql = "DELETE FROM stock_ticker;";
         String addSql = "INSERT INTO stock_ticker (ticker, stock_company_name, stock_type) " +
                 "VALUES (?, ?, ?);";
-//        try {
-//            jdbcTemplate.update(deleteSql);
-//            for (Ticker ticker : tickers) {
-//                jdbcTemplate.update(addSql, ticker.getTicker(), ticker.getStockName(), ticker.getType());
-//            }
-//        } catch (CannotGetJdbcConnectionException e) {
-//            throw new RuntimeException("Unable to connect to server or database", e);
-//        } catch (BadSqlGrammarException e) {
-//            throw new RuntimeException("SQL syntax error", e);
-//        }
         try {
             jdbcTemplate.update(deleteSql);
             List<Object[]> list = new ArrayList<>();
@@ -44,6 +36,7 @@ public class JdbcTickerDao implements TickerDao {
                 };
                 list.add(object);
             }
+            // use batchUpdate for fast insert into the database
             jdbcTemplate.batchUpdate(addSql, list);
         } catch (CannotGetJdbcConnectionException e) {
             throw new RuntimeException("Unable to connect to server or database", e);

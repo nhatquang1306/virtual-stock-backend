@@ -23,6 +23,8 @@ public class TickerController {
         this.service = service;
         this.tickerDao = tickerDao;
     }
+
+    // reset the ticker database
     @RequestMapping(value = "/tickers/reset/", method = RequestMethod.POST)
     public void resetTickers(Principal principal) {
         if (principal.getName().equals("quang") || principal.getName().equals("james") || principal.getName().equals("nick")) {

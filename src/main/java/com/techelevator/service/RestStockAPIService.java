@@ -22,8 +22,8 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
 
-@Service // Connects through SpringBoot so that Spring knows that this is the class to run
-// when we create a StockAPIService object
+// Connects through SpringBoot so that Spring knows that this is the class to run when we create a StockAPIService object
+@Service
 public class RestStockAPIService implements StockAPIService {
 
     RestTemplate restTemplate;
@@ -43,6 +43,7 @@ public class RestStockAPIService implements StockAPIService {
 
     @Override
     public List<Stock> getStocks(LocalDate date) {
+        // calculate the previous date as today's stock information is not available, go to friday if today is sunday or monday
         // Monday dayOfWeek value is 1
         if (date.getDayOfWeek().getValue() == 1) {
             date = date.minusDays(3);
@@ -52,6 +53,7 @@ public class RestStockAPIService implements StockAPIService {
         } else {
             date = date.minusDays(1);
         }
+        // call the api to get all stock information
         String url = "https://api.polygon.io/v2/aggs/grouped/locale/us/market/stocks/" + date + "?adjusted=true";
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", token);
@@ -89,6 +91,7 @@ public class RestStockAPIService implements StockAPIService {
         return listOfStocks;
     }
 
+    // call the api to get stock information for a certain date
     @Override
     public Graph getStockForDate(LocalDate date, String ticker) {
         StringBuilder sb = new StringBuilder();
@@ -97,6 +100,7 @@ public class RestStockAPIService implements StockAPIService {
         headers.set("Authorization", token);
         HttpEntity<StockGraph> httpEntity = new HttpEntity<>(headers);
         ResponseEntity<StockGraph> response = restTemplate.exchange(sb.toString(), HttpMethod.GET, httpEntity, StockGraph.class);
+        // build price chart with stock information
         Graph graph = new Graph();
         graph.buildGraph(response.getBody());
         return graph;

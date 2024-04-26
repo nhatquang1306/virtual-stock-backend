@@ -22,6 +22,7 @@ public class JdbcUserDao implements UserDao {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    // get user id by username
     @Override
     public int findIdByUsername(String username) {
         if (username == null) throw new IllegalArgumentException("Username cannot be null");
@@ -36,6 +37,7 @@ public class JdbcUserDao implements UserDao {
         return userId;
     }
 
+    // get username by user id
 	@Override
 	public User getUserById(int userId) {
 		String sql = "SELECT * FROM users WHERE user_id = ?";

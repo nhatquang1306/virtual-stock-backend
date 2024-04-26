@@ -21,6 +21,8 @@ public class JdbcGameDao implements GameDao {
     public JdbcGameDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
+    // get all games in the database
     @Override
     public List<Game> getAllGames() {
         List<Game> games = new ArrayList<>();
@@ -32,6 +34,7 @@ public class JdbcGameDao implements GameDao {
         return games;
     }
 
+    // get game by id
     @Override
     public Game getGameById(int gameId) {
         String sql = "SELECT * FROM game WHERE game_id = ?";
@@ -42,6 +45,7 @@ public class JdbcGameDao implements GameDao {
         return null;
     }
 
+    // get all games that a user participates in
     @Override
     public List<Integer> getGamesForUser(String username) {
         List<Integer> games = new ArrayList<>();
@@ -53,6 +57,7 @@ public class JdbcGameDao implements GameDao {
         return games;
     }
 
+    // get list of users for a certain game
     @Override
     public List<String> getUsersForGame(int gameId) {
         List<String> users = new ArrayList<>();
@@ -64,6 +69,7 @@ public class JdbcGameDao implements GameDao {
         return users;
     }
 
+    // get leaderboard for a game
     @Override
     public List<UserWithBalance> getLeaderboard(int gameId) {
         List<UserWithBalance> leaderboard = new ArrayList<>();
@@ -71,6 +77,7 @@ public class JdbcGameDao implements GameDao {
                 "JOIN users USING (user_id) " +
                 "WHERE game_id = ?";
         SqlRowSet result = jdbcTemplate.queryForRowSet(sql, gameId);
+        // UserWithBalance is a class to map balance to user
         while (result.next()) {
             UserWithBalance user = new UserWithBalance();
             user.setBalance(result.getBigDecimal("game_balance"));
@@ -81,12 +88,14 @@ public class JdbcGameDao implements GameDao {
         return leaderboard;
     }
 
+    // get balance of an user for a game
     @Override
     public BigDecimal getUserBalance(String username, int gameId) {
         String sql = "SELECT game_balance FROM user_game WHERE user_id = (SELECT user_id FROM users WHERE username = ?) AND game_id = ?";
         return jdbcTemplate.queryForObject(sql, BigDecimal.class, username, gameId);
     }
 
+    // create a new game
     @Override
     public Game createGame(String username, Game game) {
         int id;
@@ -99,6 +108,7 @@ public class JdbcGameDao implements GameDao {
         return getGameById(id);
     }
 
+    // let a user join a game
     @Override
     public void joinGame(String username, int gameId) {
         String sql = "INSERT INTO user_game (user_id, game_id, game_balance) " +
@@ -111,12 +121,14 @@ public class JdbcGameDao implements GameDao {
 
     }
 
+    // let a user leave a game
     @Override
     public void leaveGame(String username, int gameId) {
         String sql = "DELETE FROM user_game WHERE user_id = (SELECT user_id FROM users WHERE username = ?) AND game_id = ?";
         jdbcTemplate.update(username, gameId);
     }
 
+    // set the winner of a game
     @Override
     public String setWinner(int gameId) {
         String getWinner = "SELECT username FROM users WHERE user_id = (SELECT user_id FROM user_game WHERE game_id = ? ORDER BY game_balance DESC LIMIT 1)";
@@ -126,8 +138,10 @@ public class JdbcGameDao implements GameDao {
         return username;
     }
 
+    // get the global leaderboard
     @Override
     public List<PlayerRank> getGlobalLeaderboard() {
+        // PlayerRank is a class that maps rank to a player
         List<PlayerRank> leaderboard = new ArrayList<>();
         String sql = "WITH games_count AS " +
                 "(SELECT username, COUNT(*) AS total_games FROM user_game JOIN users USING (user_id) " +

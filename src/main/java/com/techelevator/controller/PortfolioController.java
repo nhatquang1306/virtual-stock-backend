@@ -18,10 +18,14 @@ public class PortfolioController {
     public PortfolioController(PortfolioDao portfolioDao) {
         this.portfolioDao = portfolioDao;
     }
+
+    // get all currently owned stocks
     @GetMapping(value = "/games/{id}/stocks")
     public List<Portfolio> viewCurrentStocks(@PathVariable int id, Principal principal) {
         return portfolioDao.viewCurrentStocks(principal.getName(), id);
     }
+
+    // get the quantity owned of a specific stock
     @GetMapping(value = "/games/{id}/{ticker}/owned")
     public BigDecimal getQuantityOwned(@PathVariable int id, @PathVariable String ticker, Principal principal) {
         return portfolioDao.getQuantityOwned(ticker, principal.getName(), id);

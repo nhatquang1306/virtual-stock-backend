@@ -28,8 +28,10 @@ public class JdbcStockDao implements StockDao {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    // input stock information into the database
     @Override
     public void updateStockInfo(List<Stock> stocks) {
+        // calculate the previous date as today's stock information is not available, go to friday if today is sunday or monday
         LocalDate date = LocalDate.now();
         if (date.getDayOfWeek().getValue() == 1) {
             date = date.minusDays(3);
@@ -59,6 +61,7 @@ public class JdbcStockDao implements StockDao {
                 };
                 list.add(object);
             }
+            // use batchUpdate for fast insert into the database
             jdbcTemplate.batchUpdate(addSql, list);
         } catch (CannotGetJdbcConnectionException e) {
             throw new RuntimeException("Unable to connect to server or database", e);
@@ -67,8 +70,10 @@ public class JdbcStockDao implements StockDao {
         }
     }
 
+    // get all stock information from the database
     @Override
     public List<Stock> getAllStocks() {
+        // calculate the current time of day
         int hour = LocalTime.now().getHour();
         int minute = LocalTime.now().getMinute() / 5;
         List<Stock> stocks = new ArrayList<>();
@@ -78,6 +83,7 @@ public class JdbcStockDao implements StockDao {
         Random rand = new Random();
         while (result.next()) {
             Stock stock = mapRowsToStock(result);
+            // calculate the stock price using seeded rng, making it consistent across all users
             rand.setSeed(generateSeed(stock.getTicker(), hour * 12 + minute));
             stock.setName(result.getString("stock_company_name"));
             BigDecimal diff = stock.getHighestPrice().subtract(stock.getLowestPrice());
@@ -87,6 +93,7 @@ public class JdbcStockDao implements StockDao {
         return stocks;
     }
 
+    // get stock information by ticker
     @Override
     public Stock getStockByTicker(String ticker) {
         int hour = LocalTime.now().getHour();
